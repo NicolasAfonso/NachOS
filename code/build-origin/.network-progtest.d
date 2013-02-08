@@ -8,7 +8,7 @@ network-progtest.o: ../userprog/progtest.cc ../threads/copyright.h \
  ../machine/timer.h ../filesys/synchdisk.h ../machine/disk.h \
  ../threads/synch.h ../network/post.h ../machine/network.h \
  ../threads/synchlist.h ../threads/synch.h ../machine/console.h \
- ../userprog/addrspace.h
+ ../userprog/addrspace.h ../userprog/synchconsole.h
  ../userprog/progtest.cc ../threads/copyright.h \
  ../threads/system.h ../threads/copyright.h ../threads/utility.h \
  ../threads/bool.h ../machine/sysdep.h ../threads/thread.h \
@@ -19,4 +19,4 @@ network-progtest.o: ../userprog/progtest.cc ../threads/copyright.h \
  ../machine/timer.h ../filesys/synchdisk.h ../machine/disk.h \
  ../threads/synch.h ../network/post.h ../machine/network.h \
  ../threads/synchlist.h ../threads/synch.h ../machine/console.h \
- ../userprog/addrspace.h:
+ ../userprog/addrspace.h ../userprog/synchconsole.h:

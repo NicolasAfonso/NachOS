@@ -6,7 +6,7 @@ userprog-progtest.o: ../userprog/progtest.cc ../threads/copyright.h \
  ../filesys/openfile.h ../threads/scheduler.h ../threads/list.h \
  ../machine/interrupt.h ../threads/list.h ../machine/stats.h \
  ../machine/timer.h ../machine/console.h ../userprog/addrspace.h \
- ../threads/synch.h
+ ../threads/synch.h ../userprog/synchconsole.h
  ../userprog/progtest.cc ../threads/copyright.h \
  ../threads/system.h ../threads/copyright.h ../threads/utility.h \
  ../threads/bool.h ../machine/sysdep.h ../threads/thread.h \
@@ -15,4 +15,4 @@ userprog-progtest.o: ../userprog/progtest.cc ../threads/copyright.h \
  ../filesys/openfile.h ../threads/scheduler.h ../threads/list.h \
  ../machine/interrupt.h ../threads/list.h ../machine/stats.h \
  ../machine/timer.h ../machine/console.h ../userprog/addrspace.h \
- ../threads/synch.h:
+ ../threads/synch.h ../userprog/synchconsole.h:

@@ -7,12 +7,12 @@ static Semaphore *readAvail;
 static Semaphore *writeDone;
 static void ReadAvail(int arg) { readAvail->V(); }
 static void WriteDone(int arg) { writeDone->V(); }
-                                            3
+                                            
 SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
   readAvail = new Semaphore("read avail", 0);
   writeDone = new Semaphore("write done", 0);
-  console = new Console(ReadFile,writeFile,ReadAvail,WriteDone,0);
+  console = new Console(readFile,writeFile,ReadAvail,WriteDone,0);
 }
 SynchConsole::~SynchConsole()
 {
@@ -22,14 +22,20 @@ SynchConsole::~SynchConsole()
 }
 void SynchConsole::SynchPutChar(const char ch)
 {
-  // ...
+        console->PutChar('<');
+        writeDone->P();
+        console->PutChar(ch);
+        writeDone->P();
+        console->PutChar('>');
+        writeDone->P();
 }
-/*
+
 char SynchConsole::SynchGetChar()
 {
-  // ...
+        readAvail->P();
+        return console->GetChar();
 }
-*/
+
 void SynchConsole::SynchPutString(const char s[])
 {
   // ...
