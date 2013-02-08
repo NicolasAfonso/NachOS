@@ -21,5 +21,5 @@ PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #ifdef MAIN			/* include the copyright message in every executable */
 static const char *copyright __attribute__((unused)) =
-    "Copyright (c) 1992-1993 The Regents of the University of California.  All rights reserved.";
+    "Copyright (c) 1992-1993 The Regents of the University of California.  All rights reserved.\nCopyright (c) January 2013, Nicolas Afonso && Pierre Lartigue for the RICM4 AAS's course. All rights reserved.\n";
 #endif // MAIN
