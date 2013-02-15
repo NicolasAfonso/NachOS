@@ -30,6 +30,13 @@
 #define SC_Fork		9
 #define SC_Yield	10
 
+#ifdef CHANGED
+//macro pour put and getChar
+#define SC_PutChar 11
+#define SC_ReadChar 12
+
+#endif //CHANGED
+
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -111,6 +118,15 @@ int Read (char *buffer, int size, OpenFileId id);
 
 /* Close the file, we're done reading and writing to it. */
 void Close (OpenFileId id);
+
+#ifdef CHANGED
+/*to write a char*/
+void PutChar(char c);
+
+
+#endif //CHANGED
+
+
 
 
 

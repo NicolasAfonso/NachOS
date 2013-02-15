@@ -38,7 +38,7 @@ char SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
-  // ...
+        
 }
 void SynchConsole::SynchGetString(char *s, int n)
 {
