@@ -27,9 +27,19 @@ FileSystem *fileSystem;
 SynchDisk *synchDisk;
 #endif
 
+#ifndef CHANGED
 #ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
 Machine *machine;		// user program memory and registers
 #endif
+
+#else//CHANGED
+#ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
+Machine *machine;		// user program memory and registers
+SynchConsole *synchconsole;
+#endif
+
+#endif//CHANGED
+
 
 #ifdef NETWORK
 PostOffice *postOffice;
@@ -154,10 +164,19 @@ Initialize (int argc, char **argv)
 
     interrupt->Enable ();
     CallOnUserAbort (Cleanup);	// if user hits ctl-C
+#ifndef CHANGED
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
 #endif
+
+#else //CHANGED
+#ifdef USER_PROGRAM
+    machine = new Machine (debugUserProg);	// this must come first
+    synchconsole = new SynchConsole(NULL,NULL);
+#endif
+
+#endif//CHANGED
 
 #ifdef FILESYS
     synchDisk = new SynchDisk ("DISK");
@@ -183,10 +202,16 @@ Cleanup ()
 #ifdef NETWORK
     delete postOffice;
 #endif
-
+#ifndef CHANGED
 #ifdef USER_PROGRAM
     delete machine;
 #endif
+#else //CHANGED
+#ifdef USER_PROGRAM
+    delete machine;
+    delete synchconsole;
+#endif
+#endif//CHANGED
 
 #ifdef FILESYS_NEEDED
     delete fileSystem;

@@ -24,7 +24,9 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
-
+#ifdef CHANGED
+#include "synchconsole.h"
+#endif
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -80,7 +82,7 @@ ExceptionHandler (ExceptionType which)
             
             case(SC_PutChar): {
                     DEBUG ('a', "Shutdown, initiated by user program.\n");
-                    interrupt->PutChar ();
+                    synchconsole->SynchPutChar ((char)machine->ReadRegister(4));
                     break;
             }
     
