@@ -123,7 +123,6 @@ void Close (OpenFileId id);
 /*to write a char*/
 void PutChar(char c);
 
-
 #endif //CHANGED
 
 
