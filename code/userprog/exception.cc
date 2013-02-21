@@ -24,9 +24,14 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+
 #ifdef CHANGED
 #include "synchconsole.h"
-#endif
+#include "machine.h"
+//defini plus bas
+void putStringHandler(char *s);
+void copyStringToMachine(char *s,char *to,int size);
+#endif //CHANGED
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -85,6 +90,27 @@ ExceptionHandler (ExceptionType which)
                     synchconsole->SynchPutChar ((char)machine->ReadRegister(4));
                     break;
             }
+            case(SC_PutString): {
+                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    putStringHandler((char *)machine->ReadRegister(4));
+                    break;
+            }
+            case(SC_GetChar): {
+                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    machine->WriteRegister(2,(int) synchconsole->SynchGetChar());
+                    break;
+            }
+            case(SC_GetString): {
+                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    //adresse du resultat
+                    char *to = (char *) machine->ReadRegister(4);
+                    int size = (int) machine->ReadRegister(5);
+                    char *buffer = new char[MAX_STRING_SIZE];
+                    synchconsole->SynchGetString(buffer,size);
+                    copyStringToMachine(buffer,to,size);
+                    delete [] buffer;
+                    break;
+            }
     
             default: {
                     printf ("Unexpected user mode exception %d %d\n", which, type);
@@ -109,3 +135,34 @@ if ((which == SyscallException && type == SC_Halt))
     UpdatePC ();
     // End of addition
 }
+
+#ifdef CHANGED
+void 
+copyStringFromMachine (int from, char *to, unsigned size) {
+        unsigned i;
+        for(i=0;i<size && machine->mainMemory[from+i] !='\0';i++) {
+                to[i] = machine->mainMemory[from+i];
+        }
+        to[i] = '\0';
+}
+
+void
+putStringHandler(char *s) {
+        char *buffer = new char[MAX_STRING_SIZE];
+        copyStringFromMachine((int)s,buffer,MAX_STRING_SIZE);
+        synchconsole->SynchPutString(buffer);
+        delete [] buffer;
+}
+
+void 
+copyStringToMachine(char *s, char *to, int size) {
+        int i;
+        for(i=0;i<size-1 && s[i] !='\0';i++) {
+                machine->mainMemory[(unsigned)(to+i)] = (char) s[i];
+        }
+        
+        machine->mainMemory[(unsigned)(to+i)] = '\0';
+}
+
+
+#endif //CHANGED

@@ -22,12 +22,12 @@ SynchConsole::~SynchConsole()
 }
 void SynchConsole::SynchPutChar(const char ch)
 {
-        console->PutChar('<');
-        writeDone->P();
+        //console->PutChar('<');
+        //writeDone->P();
         console->PutChar(ch);
         writeDone->P();
-        console->PutChar('>');
-        writeDone->P();
+        // console->PutChar('>');
+        //writeDone->P();
 }
 
 char SynchConsole::SynchGetChar()
@@ -38,10 +38,24 @@ char SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
-        
+        int i;
+        for(i=0;i<MAX_STRING_SIZE && s[i]!='\0';i++) {
+                synchconsole->SynchPutChar((char)s[i]);
+                //writeDone->P();
+        }
+        synchconsole->SynchPutChar('\n');
+        //writeDone->P();
 }
+
 void SynchConsole::SynchGetString(char *s, int n)
 {
-  // ...
+        int i;
+        char c;
+        for(i=0;i<n-1;i++) {
+                c=synchconsole->SynchGetChar();
+                if(c==EOF || c=='\n') break;
+                else s[i] = c;
+        }
+        s[i] = '\0';
 }
 #endif // CHANGED
