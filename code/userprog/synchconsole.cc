@@ -8,11 +8,14 @@ static Semaphore *writeDone;
 static void ReadAvail(int arg) { readAvail->V(); }
 static void WriteDone(int arg) { writeDone->V(); }
                                             
+static Semaphore *semPutChar;
+
 SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
   readAvail = new Semaphore("read avail", 0);
   writeDone = new Semaphore("write done", 0);
   console = new Console(readFile,writeFile,ReadAvail,WriteDone,0);
+  semPutChar = new Semaphore("PutChar", 1);
 }
 SynchConsole::~SynchConsole()
 {
@@ -24,8 +27,10 @@ void SynchConsole::SynchPutChar(const char ch)
 {
         //console->PutChar('<');
         //writeDone->P();
+	semPutChar->P();
         console->PutChar(ch);
         writeDone->P();
+	semPutChar->V();
         // console->PutChar('>');
         //writeDone->P();
 }

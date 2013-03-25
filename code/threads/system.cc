@@ -162,6 +162,7 @@ Initialize (int argc, char **argv)
     currentThread = new Thread ("main");
     currentThread->setStatus (RUNNING);
 
+
     interrupt->Enable ();
     CallOnUserAbort (Cleanup);	// if user hits ctl-C
 #ifndef CHANGED

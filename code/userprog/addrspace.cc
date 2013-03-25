@@ -21,6 +21,9 @@
 #include "noff.h"
 
 #include <strings.h>		/* for bzero */
+#ifdef CHANGED
+#include "bitmap.h"
+#endif//CHANGED
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -119,6 +122,16 @@ AddrSpace::AddrSpace (OpenFile * executable)
 			       [noffH.initData.virtualAddr]),
 			      noffH.initData.size, noffH.initData.inFileAddr);
       }
+#ifdef CHANGED
+//initialisation du nombre de thread et de la semaphore sur cette variable
+    threadNumber = 1;
+    semThreadNumber = new Semaphore("semThreadNumber",1);
+    semBitMap = new Semaphore("semBitMap",1);
+    bitMap = new BitMap((UserStackSize/threadPageNumber)-1);
+    bitMap->Mark(0);//le thread main est en 0
+    semMainWait = new Semaphore("MainWait",0);//aucun thread utilisateur au debut
+#endif //CHANGED
+
 
 }
 
@@ -179,6 +192,11 @@ AddrSpace::InitRegisters ()
 void
 AddrSpace::SaveState ()
 {
+#ifdef CHANGED
+//operations inverses du restore state
+        pageTable = machine->pageTable;
+        numPages = machine->pageTableSize;
+#endif //CHANGED
 }
 
 //----------------------------------------------------------------------
@@ -195,3 +213,85 @@ AddrSpace::RestoreState ()
     machine->pageTable = pageTable;
     machine->pageTableSize = numPages;
 }
+
+#ifdef CHANGED 
+/*methodes getteur et setteur du nombre de threads utilisateur*/
+//TODO Pour l instant, seul l ajout de thread est possible
+//la suppression n est pas prise en compte
+
+int
+AddrSpace::getThreadNumber() {
+        return threadNumber;
+}
+
+void
+AddrSpace::addUserThread() {
+//cette methode necessite une exclusion mutuelle
+        semThreadNumber->P();
+        threadNumber++;
+        semThreadNumber->V();
+}
+
+void
+AddrSpace::deleteUserThread() {
+//cette methode necessite une exclusion mutuelle
+        semThreadNumber->P();
+        semBitMap->P();
+        threadNumber--;
+        bitMap->Clear(currentThread->id);
+        DEBUG('t',"destruction de USERTHREAD\n");
+        if(threadNumber==0)semMainWait->V();//liberation du thread main
+        semBitMap->V();
+        semThreadNumber->V();
+}
+
+
+//revoie la prochaine adresse de pointeur de pile pour l'ajout d'un nouveau thread
+//retourne -1 si le place pour la pile est insufisante
+//met l identifiant du nouveau thread a l adresse passee en parametre
+
+int 
+AddrSpace::getNextThreadSpace(int *threadid) {
+
+        int floorAddress = numPages*PageSize;
+/*VERSION SANS BITMAP
+        int toReturn = floorAddress - (PageSize*threadPageNumber*threadNumber);
+        if(toReturn <= (floorAddress-UserStackSize)) {
+                //impossible de creer une nouvelle thread -> pas assez de memoire
+                return -1;
+        }
+        else {
+                addUserThread();
+                return toReturn;
+        }
+*/
+//VERSION BITMAP
+        int toReturn;
+        semBitMap->P();
+        *threadid = bitMap->Find();
+        if(*threadid != -1) {
+                toReturn = floorAddress - (PageSize*threadPageNumber*(*threadid));
+                machine->WriteRegister(2,*threadid);
+        }
+        semBitMap->V();
+        return toReturn;
+}
+
+void
+AddrSpace::do_Exit() {
+        currentThread->space->deleteUserThread();
+                
+        if(currentThread->space->getThreadNumber() != 0) {
+                semMainWait->P();
+                //currentThread->Yield();
+        }
+        delete currentThread->space;
+        
+        ASSERT(currentThread->space->getThreadNumber() == 0);
+        DEBUG('t',"destruction du thread main\n");
+        DEBUG('a', "Fin programme.\n");
+        interrupt->Halt();
+}
+
+#endif //CHANGED
+

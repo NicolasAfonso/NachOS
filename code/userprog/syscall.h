@@ -37,6 +37,11 @@
 #define SC_GetChar 13
 #define SC_GetString 14
 
+//step 3
+#define SC_UserThreadCreate 15
+#define SC_UserThreadExit 16
+
+
 #endif //CHANGED
 
 #ifdef IN_USER_MODE
@@ -128,6 +133,9 @@ char GetChar();
 void GetString(char *s, int n); 
 void PutString(char *c);
 
+//step 3
+int UserThreadCreate(void *f, void *arg);
+void UserThreadExit();
 #endif //CHANGED
 
 

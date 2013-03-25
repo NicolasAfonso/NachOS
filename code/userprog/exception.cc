@@ -28,6 +28,7 @@
 #ifdef CHANGED
 #include "synchconsole.h"
 #include "machine.h"
+#include "userthread.h"
 //defini plus bas
 void putStringHandler(char *s);
 void copyStringToMachine(char *s,char *to,int size);
@@ -75,6 +76,7 @@ void
 ExceptionHandler (ExceptionType which)
 {
     int type = machine->ReadRegister (2);
+    
 #ifdef CHANGED
     if (which == SyscallException) {
             switch(type) {
@@ -85,23 +87,30 @@ ExceptionHandler (ExceptionType which)
                     break;
             }
             
+            case(SC_Exit): {
+                    DEBUG ('a', "EXIT\n");
+                    currentThread->space->do_Exit();
+                    break;
+            }
+            
             case(SC_PutChar): {
-                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    DEBUG ('a', "Putchar\n");
                     synchconsole->SynchPutChar ((char)machine->ReadRegister(4));
                     break;
             }
             case(SC_PutString): {
-                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    DEBUG ('a', "PutString\n");
                     putStringHandler((char *)machine->ReadRegister(4));
                     break;
             }
             case(SC_GetChar): {
-                    DEBUG ('a', "Shutdown, initiated by user program.\n");
-                    machine->WriteRegister(2,(int) synchconsole->SynchGetChar());
+                    DEBUG ('a', "GetChar\n");
+                    machine->WriteRegister(2,
+                                           (int) synchconsole->SynchGetChar());
                     break;
             }
             case(SC_GetString): {
-                    DEBUG ('a', "Shutdown, initiated by user program.\n");
+                    DEBUG ('a', "GetString\n");
                     //adresse du resultat
                     char *to = (char *) machine->ReadRegister(4);
                     int size = (int) machine->ReadRegister(5);
@@ -111,6 +120,28 @@ ExceptionHandler (ExceptionType which)
                     delete [] buffer;
                     break;
             }
+            case(SC_UserThreadCreate): {
+                    DEBUG ('a', "UserThreadCreate\n");
+                    do_UserThreadCreate((int)machine->ReadRegister(4),
+                                        (int)machine->ReadRegister(5));
+                    break;
+            }
+            case(SC_UserThreadExit): {
+                    DEBUG ('a', "UserThreadExit\n");
+                    do_UserThreadExit();
+                    break;
+            }
+/*plus tard
+            case(SC_UserThreadJoin): {
+                    DEBUG ('a', "UserThreadJoin\n");
+                    int threadID = machine -> ReadRegister(4);                    
+                    int tt = do_UserThreadJoin(threadID);
+                    machine->WriteRegister(2,tt);
+                    break;
+            }
+*/
+
+
     
             default: {
                     printf ("Unexpected user mode exception %d %d\n", which, type);
@@ -163,6 +194,7 @@ copyStringToMachine(char *s, char *to, int size) {
         
         machine->mainMemory[(unsigned)(to+i)] = '\0';
 }
+
 
 
 #endif //CHANGED

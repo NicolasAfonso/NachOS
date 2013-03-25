@@ -524,7 +524,7 @@ Fork:Fork118,2082
 Yield:Yield126,2163
 __main:__main135,2306
 
-threads/switch.S,309
+threads/switch.S,x309x
 ThreadRoot:ThreadRoot65,1913
 SWITCH:SWITCH82,2328
 .seg 127,3300

@@ -18,6 +18,14 @@
 
 #define UserStackSize		1024	// increase this as necessary!
 
+#ifdef CHANGED
+#include "synch.h"
+#include "bitmap.h"
+/**nombre de pages allouees par thread utilisateur*/
+#define threadPageNumber 3
+
+#endif//CHANGED
+
 class AddrSpace
 {
   public:
@@ -31,12 +39,32 @@ class AddrSpace
 
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
+#ifdef CHANGED
+//methodes crees
+    int getThreadNumber();//retourne le nombre de threads utilisateur
+    void addUserThread();//incremente de nombre de threads
+    void deleteUserThread();//decremente de nombre de threads
+    int getNextThreadSpace(int *threadid);//retourne le prochain pointeur de pile pour une nouvelle thread
+    void do_Exit();
+#endif //CHANGED
 
   private:
-      TranslationEntry * pageTable;	// Assume linear page table translation
+    TranslationEntry * pageTable;	// Assume linear page table translation
     // for now!
     unsigned int numPages;	// Number of pages in the virtual 
     // address space
+#ifdef CHANGED
+    int threadNumber; //nombre de threads operants sur cet espace d adressage
+    Semaphore* semThreadNumber; //semaphone pour modifier le nombre de thread
+
+    BitMap *bitMap;
+    Semaphore *semBitMap;
+
+    Semaphore *semMainWait;
+    //utilisateur en exclusion mutuelle
+#endif //CHANGED
+
+
 };
 
 #endif // ADDRSPACE_H
